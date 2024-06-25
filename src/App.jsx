@@ -19,10 +19,54 @@ function downloadInfoForSelectedDashboard(){
 }
 
 function App() {
+  const [uploadedFile, setUploadedFile] = useState(null);
   const [data, setData] = useState(initialData);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+
+  const [isDragging, setIsDragging] = useState(false);
+  const dragCounter = useRef(0);
+
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDragIn = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounter.current++;
+    if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+      setIsDragging(true);
+    }
+  };
+
+  const handleDragOut = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounter.current--;
+    if (dragCounter.current === 0) {
+      setIsDragging(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    dragCounter.current = 0;
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const file = e.dataTransfer.files[0];
+      if (file.type === "text/csv") {
+        setUploadedFile(file);
+        console.log("File uploaded:", file.name);
+      } else {
+        alert("Please upload a valid CSV file.");
+      }
+      e.dataTransfer.clearData();
+    }
+  };
 
   useEffect(() => {
     setSelectedFiles([]);
@@ -40,6 +84,17 @@ function App() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    if (file && file.type === "text/csv") {
+      setUploadedFile(file);
+      // Here you would typically send the file to your server or process it
+      console.log("File uploaded:", file.name);
+    } else {
+      alert("Please upload a valid CSV file.");
+    }
+  };
 
   function loadDashboard(dataItem) {
     if (selectedFiles.length === 0 || selectedFiles.includes(dataItem.date)) {
@@ -90,11 +145,29 @@ function App() {
             {data.map(dataItem => loadDashboard(dataItem))}
         </div>
         <div className='right-main-content'>
-          <div className='page-file-uploads-container'>
-            <h1 className='page-file-upload-text'> Drop file here to upload </h1>
-            <h1 className='page-file-upload-text-bold'> or </h1>
-            <button className='page-file-upload-button'>Select a file</button>
-          </div>
+        <div 
+          className={`page-file-uploads-container ${isDragging ? 'dragging' : ''}`}
+          onDragEnter={handleDragIn}
+          onDragLeave={handleDragOut}
+          onDragOver={handleDrag}
+          onDrop={handleDrop}
+        >
+          <h1 className='page-file-upload-text'> Drop CSV file here to upload </h1>
+          <h1 className='page-file-upload-text-bold'> or </h1>
+          <label htmlFor="file-upload" className='page-file-upload-button'>
+            Select a file
+          </label>
+          <input 
+            id="file-upload" 
+            type="file" 
+            accept=".csv" 
+            style={{display: 'none'}} 
+            onChange={handleFileUpload}
+          />
+          {uploadedFile && (
+            <p className='page-file-upload-text-smaller'>Uploaded: {uploadedFile.name}</p>
+          )}
+        </div>
           <div className='page-file-compare-container'>
             <h1 className='page-file-upload-text'> Select uploads to</h1>
             <h1 className='page-file-upload-text-bold'> compare </h1>
