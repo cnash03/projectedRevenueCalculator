@@ -28,23 +28,31 @@ function App() {
   }, []);
 
   function loadDashboard(dataItem) {
-    return (
-      <div key={dataItem.date} className="page-dashboard-outer-container">
-        <h5 className='page-dashboard-outer-container-title'>
-          <span>{dataItem.date}</span> 
-          <span className='offset-color-text'> Upload</span>
-        </h5>
-      </div>
-    );
+    if (selectedFiles.length === 0 || selectedFiles.includes(dataItem.date)) {
+      return (
+        <div key={dataItem.date} className="page-dashboard-outer-container">
+          <h5 className='page-dashboard-outer-container-title'>
+            <span>{dataItem.date}</span> 
+            <span className='offset-color-text'> Upload</span>
+          </h5>
+        </div>
+      );
+    }
+    return null;
   }
 
   const handleFileSelect = (date) => {
     setSelectedFiles(prev => {
-      if (prev.includes(date)) {
-        return prev.filter(item => item !== date);
-      } else {
-        return [...prev, date];
+      const newSelection = prev.includes(date)
+        ? prev.filter(item => item !== date)
+        : [...prev, date];
+      
+      // If no files are selected, show all dashboards
+      if (newSelection.length === 0) {
+        return [];
       }
+      
+      return newSelection;
     });
   };
 
