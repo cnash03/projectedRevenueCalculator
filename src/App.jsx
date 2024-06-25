@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect , useRef} from 'react'
 import PooRoverLogo from './assets/PooRoverLogo.png'
 import './App.css'
 
@@ -22,9 +22,23 @@ function App() {
   const [data, setData] = useState(initialData);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     setSelectedFiles([]);
+  }, []);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   function loadDashboard(dataItem) {
@@ -84,7 +98,7 @@ function App() {
           <div className='page-file-compare-container'>
             <h1 className='page-file-upload-text'> Select uploads to</h1>
             <h1 className='page-file-upload-text-bold'> compare </h1>
-            <div className="dropdown-wrapper">
+            <div className="dropdown-wrapper" ref={dropdownRef}>
               <div className={`form_dropdown-toggle ${isDropdownOpen ? 'open' : ''}`} onClick={toggleDropdown}>
                 <div className="dropdown-placeholder">
                   {selectedFiles.length > 0 ? selectedFiles.join(', ') : 'Select'}
