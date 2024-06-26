@@ -1,6 +1,7 @@
-import { useState, useEffect , useRef} from 'react'
-import PooRoverLogo from './assets/PooRoverLogo.png'
-import './App.css'
+import { useState, useEffect , useRef} from 'react';
+import PooRoverLogo from './assets/PooRoverLogo.png';
+import { parseAndUploadCSV, fetchFirestoreData } from './csvFileUpload';
+import './App.css';
 
 class Data {
   constructor(date) {
@@ -10,7 +11,7 @@ class Data {
 
 const initialData = [
   new Data("Live"),
-  new Data("2/27/2024"),
+  new Data("2/25/2024"),
   new Data("2/18/2024"),
 ];
 
@@ -23,7 +24,9 @@ function App() {
   const [data, setData] = useState(initialData);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const dropdownRef = useRef(null);
+
 
   const [isDragging, setIsDragging] = useState(false);
   const dragCounter = useRef(0);
@@ -51,7 +54,7 @@ function App() {
     }
   };
 
-  const handleDrop = (e) => {
+  const handleDrop = async (e) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
@@ -59,14 +62,33 @@ function App() {
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const file = e.dataTransfer.files[0];
       if (file.type === "text/csv") {
-        setUploadedFile(file);
-        console.log("File uploaded:", file.name);
+        try {
+          const newData = await parseAndUploadCSV(file);
+          setData(prevData => [...prevData, ...newData]);
+          setUploadedFile(file);
+        } catch (error) {
+          console.error("Error processing file:", error);
+          alert("An error occurred while processing the file.");
+        }
       } else {
         alert("Please upload a valid CSV file.");
       }
       e.dataTransfer.clearData();
     }
   };
+
+  useEffect(() => {
+    const loadInitialData = async () => {
+      try {
+        const firestoreData = await fetchFirestoreData();
+        setData([...initialData, ...firestoreData]);
+      } catch (error) {
+        console.error("Error loading initial data:", error);
+      }
+    };
+
+    loadInitialData();
+  }, []);
 
   useEffect(() => {
     setSelectedFiles([]);
@@ -78,19 +100,25 @@ function App() {
         setIsDropdownOpen(false);
       }
     }
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
-  const handleFileUpload = (event) => {
+  const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (file && file.type === "text/csv") {
-      setUploadedFile(file);
-      // Here you would typically send the file to your server or process it
-      console.log("File uploaded:", file.name);
+      setIsUploading(true);
+      try {
+        const { data: newData, collectionName } = await parseAndUploadCSV(file);
+        setUploadedFile(file);
+      } catch (error) {
+        console.error("Error processing file:", error);
+        alert("An error occurred while processing the file. " + error.message);
+      } finally {
+        setIsUploading(false);
+      }
     } else {
       alert("Please upload a valid CSV file.");
     }
@@ -164,9 +192,13 @@ function App() {
             style={{display: 'none'}} 
             onChange={handleFileUpload}
           />
-          {uploadedFile && (
+          {isUploading ? (
+            <div className='page-file-upload-text-smaller'>
+              File is uploading...
+            </div>
+          ) : uploadedFile ? (
             <p className='page-file-upload-text-smaller'>Uploaded: {uploadedFile.name}</p>
-          )}
+          ) : null}
         </div>
           <div className='page-file-compare-container'>
             <h1 className='page-file-upload-text'> Select uploads to</h1>

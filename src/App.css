@@ -204,7 +204,7 @@
   border-top: none;
   border-radius: 0 0 .3125rem .3125rem;
   /* max-width: 200px; */
-  overflow-y: auto;
+  overflow-y: scroll;
   z-index: 3;
 }
 
