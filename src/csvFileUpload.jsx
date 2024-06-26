@@ -1,17 +1,26 @@
 import Papa from 'papaparse';
 import { initializeApp } from 'firebase/app';
 import { getFirestore, collection, addDoc, getDocs } from 'firebase/firestore';
+import { firebaseConfig } from '../configFirebase'; // Adjust the path as needed
 
-const firebaseConfig = {
-    apiKey: "AIzaSyD7lX_TKGZ5Zw_ZfN9NBwrrf04ysu5sa9U",
-    authDomain: "projected-revenue-calculator.firebaseapp.com",
-    databaseURL: "https://projected-revenue-calculator-default-rtdb.firebaseio.com",
-    projectId: "projected-revenue-calculator",
-    storageBucket: "projected-revenue-calculator.appspot.com",
-    messagingSenderId: "124990878788",
-    appId: "1:124990878788:web:b7ea8987b6c9853deaf811",
-    measurementId: "G-38L1KN7DCK"
-};
+// const firebaseConfig = {
+//     apiKey: import.meta.VITE_API_KEY,
+//     authDomain: import.meta.VITE_AUTH_DOMAIN,
+//     databaseURL: import.meta.VITE_DATABASE_URL,
+//     projectId: import.meta.VITE_PROJECT_ID,
+//     storageBucket: import.meta.VITE_STORAGE_BUCKET,
+//     messagingSenderId: import.meta.VITE_MESSAGING_SENDER_ID,
+//     appId: import.meta.VITE_APP_ID,
+//     measurementId: import.meta.VITE_MEASUREMENT_ID
+//     // apiKey: "AIzaSyD7lX_TKGZ5Zw_ZfN9NBwrrf04ysu5sa9U",
+//     // authDomain: "projected-revenue-calculator.firebaseapp.com",
+//     // databaseURL: "https://projected-revenue-calculator-default-rtdb.firebaseio.com",
+//     // projectId: "projected-revenue-calculator",
+//     // storageBucket: "projected-revenue-calculator.appspot.com",
+//     // messagingSenderId: "124990878788",
+//     // appId: "1:124990878788:web:b7ea8987b6c9853deaf811",
+//     // measurementId: "G-38L1KN7DCK"
+// };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -57,7 +66,8 @@ export const parseAndUploadCSV = (file) => {
   
         try {
           for (let item of newData) {
-            await addDoc(collection(db, "2024-02-18"), {
+            console.log("Uploading"+item);
+            await addDoc(collection(db, "2024-06-25"), {
               date: item.date,
               ...item
             });
@@ -66,6 +76,7 @@ export const parseAndUploadCSV = (file) => {
           resolve(newData);
         } catch (error) {
           console.error("Error uploading to Firestore: ", error);
+          console.error("Error details:", error.message, error.code);
           reject(error);
         }
       },
