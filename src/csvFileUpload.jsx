@@ -48,7 +48,7 @@ export const parseAndUploadCSV = (file) => {
         try {
           for (let item of newData) {
             console.log("Uploading"+item);
-            await addDoc(collection(db, "2024-02-18"), {
+            await addDoc(collection(db, collectionName), {
               date: item.date,
               ...item
             });
