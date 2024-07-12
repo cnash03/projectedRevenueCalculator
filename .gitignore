@@ -24,3 +24,4 @@ functions/serviceAccountKey.json
 *.njsproj
 *.sln
 *.sw?
+functions/serviceAccountKey.json
