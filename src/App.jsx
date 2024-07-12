@@ -2,6 +2,21 @@ import { useState, useEffect , useRef} from 'react';
 import PooRoverLogo from './assets/PooRoverLogo.png';
 import { parseAndUploadCSV, fetchFirestoreData } from './csvFileUpload';
 import './App.css';
+import { initializeApp } from 'firebase/app';
+import { getFunctions, httpsCallable } from 'firebase/functions';
+
+import { firebaseConfig } from '../configFirebase';
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+
+// Get the functions instance
+const functions = getFunctions(app);
+
+// Create the callable function
+// const listCollections = httpsCallable(functions, 'listCollections');
+const helloWorld = httpsCallable(functions, 'hello_world');
+
 
 class Data {
   constructor(date) {
@@ -15,9 +30,18 @@ const initialData = [
   new Data("2/18/2024"),
 ];
 
-function downloadInfoForSelectedDashboard(){
-  //Add download logic here
-}
+const getCollectionNames = async () => {
+  try {
+    // const result = await listCollections();
+    // const collectionNames = result.data.collections;
+    // // Use the collection names here (e.g., update state)
+    // console.log(collectionNames);
+    const result = await helloWorld();
+    console.log(result);
+  } catch (error) {
+    console.error("Error :", error);
+  }
+};
 
 function App() {
   const [uploadedFile, setUploadedFile] = useState(null);
@@ -76,6 +100,10 @@ function App() {
       e.dataTransfer.clearData();
     }
   };
+  
+  useEffect(() => {
+    getCollectionNames();
+  }, []);
 
   useEffect(() => {
     const loadInitialData = async () => {
