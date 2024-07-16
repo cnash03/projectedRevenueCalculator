@@ -4,7 +4,7 @@ import { parseAndUploadCSV, fetchFirestoreData } from './csvFileUpload';
 import './App.css';
 import { initializeApp } from 'firebase/app';
 import { getFunctions, httpsCallable } from 'firebase/functions';
-
+import axios from 'axios';
 import { firebaseConfig } from '../configFirebase';
 
 // Initialize Firebase
@@ -32,12 +32,9 @@ const initialData = [
 
 const getCollectionNames = async () => {
   try {
-    // const result = await listCollections();
-    // const collectionNames = result.data.collections;
-    // // Use the collection names here (e.g., update state)
-    // console.log(collectionNames);
-    const result = await helloWorld();
-    console.log(result);
+    console.log("ENTERED");
+    const result = await axios.get('https://us-central1-projected-revenue-calculator.cloudfunctions.net/hello_world');
+    console.log(result.data);
   } catch (error) {
     console.error("Error :", error);
   }
@@ -102,6 +99,7 @@ function App() {
   };
   
   useEffect(() => {
+    console.log("Use Effect");
     getCollectionNames();
   }, []);
 

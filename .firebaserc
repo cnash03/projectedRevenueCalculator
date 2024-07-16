@@ -1,5 +1,9 @@
 {
   "projects": {
-    "default": "projected-revenue-calculator"
-  }
+    "default": "projected-revenue-calculator",
+    "staging": "projected-revenue-calculator"
+  },
+  "targets": {},
+  "etags": {},
+  "dataconnectEmulatorConfig": {}
 }
