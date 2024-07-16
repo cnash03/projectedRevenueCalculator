@@ -67,12 +67,12 @@ export const parseAndUploadCSV = (file) => {
   });
 };
 
-export const fetchFirestoreData = async () => {
-  try {
-    const querySnapshot = await getDocs(collection(db, "customers"));
-    return querySnapshot.docs.map(doc => new Data(doc.data().date, doc.data()));
-  } catch (error) {
-    console.error("Error fetching data from Firestore: ", error);
-    throw error;
-  }
-};
+// export const fetchFirestoreData = async () => {
+//   try {
+//     const querySnapshot = await getDocs(collection(db, "customers"));
+//     return querySnapshot.docs.map(doc => new Data(doc.data().date, doc.data()));
+//   } catch (error) {
+//     console.error("Error fetching data from Firestore: ", error);
+//     throw error;
+//   }
+// };
