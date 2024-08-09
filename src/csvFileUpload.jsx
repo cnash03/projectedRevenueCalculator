@@ -1,6 +1,6 @@
 import Papa from 'papaparse';
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, addDoc, getDocs } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, getDocs, doc, setDoc } from 'firebase/firestore';
 import { firebaseConfig } from '../configFirebase'; // Adjust the path as needed
 
 const app = initializeApp(firebaseConfig);
@@ -24,7 +24,7 @@ export const parseAndUploadCSV = (file) => {
 
         // Generate the collection name based on the current date
         const uploadDate = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
-        const collectionName = `${uploadDate}`;
+        const collectionName = `2024-07-20`;
 
         for (let row of results.data) {
           // Check if all entries in the row are empty
@@ -54,11 +54,21 @@ export const parseAndUploadCSV = (file) => {
             });
           }
           console.log(`Data uploaded to Firestore successfully. ${newData.length} entries processed.`);
-          resolve(newData);
         } catch (error) {
           console.error("Error uploading to Firestore: ", error);
           console.error("Error details:", error.message, error.code);
           reject(error);
+        }
+
+        try{          
+          const collectionRef = collection(db, "entries");
+          const docRef = doc(collectionRef, collectionName); // Replace collectionName with the desired document name
+          await setDoc(docRef, {
+            collectionName
+          });
+          console.log('Document created successfully');
+        }catch(error){
+          console.error('Error creating document:', error);
         }
       },
       header: true,
@@ -66,13 +76,17 @@ export const parseAndUploadCSV = (file) => {
     });
   });
 };
+export const fetchFirestoreData = async () => {
+  try {
+    const querySnapshot = await getDocs(collection(db, "entries")); // Directly target the "Dates" collection
+    const data = querySnapshot.docs.map(doc => ({
+      id: doc.id, // Extract the document ID
+    }));
+    console.log(data);
+    return data;
+  } catch (error) {
+    console.error("Error fetching data from Firestore: ", error);
+    throw error;
+  }
 
-// export const fetchFirestoreData = async () => {
-//   try {
-//     const querySnapshot = await getDocs(collection(db, "customers"));
-//     return querySnapshot.docs.map(doc => new Data(doc.data().date, doc.data()));
-//   } catch (error) {
-//     console.error("Error fetching data from Firestore: ", error);
-//     throw error;
-//   }
-// };
+};
