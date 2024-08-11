@@ -2,12 +2,6 @@ import { useState, useEffect , useRef} from 'react';
 import PooRoverLogo from './assets/PooRoverLogo.png';
 import { parseAndUploadCSV, fetchFirestoreData } from './csvFileUpload';
 import './App.css';
-import { initializeApp } from 'firebase/app';
-import { getFunctions, httpsCallable } from 'firebase/functions';
-import axios from 'axios';
-import { firebaseConfig } from '../configFirebase';
-
-// Initialize Firebase
 
 class Data {
   constructor(date) {
