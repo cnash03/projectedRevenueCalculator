@@ -8,8 +8,6 @@ import axios from 'axios';
 import { firebaseConfig } from '../configFirebase';
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-
 
 class Data {
   constructor(date) {
