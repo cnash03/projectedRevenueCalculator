@@ -1,19 +1,9 @@
-import firebase_admin
-from firebase_admin import credentials
-from firebase_functions import https_fn, options
+from firebase_functions import https_fn
+from firebase_admin import initialize_app
 
-# Initialize the Firebase app
-cred = credentials.Certificate("serviceAccountKey.json")
-firebase_admin.initialize_app(cred)
-
-@https_fn.on_request(
-    cors=options.CorsOptions(
-        cors_origins=["*"],
-        cors_methods=["get", "post"],
-    )
-)
-
-@https_fn.on_request()
-def hello_world(req: https_fn.Request) -> https_fn.Response:
-    """Simple Hello World function that returns a greeting."""
-    return https_fn.Response("Hello World from Firebase Cloud Functions!")
+# initialize_app()
+#
+#
+# @https_fn.on_request()
+# def on_request_example(req: https_fn.Request) -> https_fn.Response:
+#     return https_fn.Response("Hello world!"
