@@ -4,7 +4,7 @@ import { getFirestore, collection, addDoc, getDocs, setDoc } from 'firebase/fire
 import { firebaseConfig } from '../configFirebase'; // Adjust the path as needed
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore();
+const db = getFirestore(app);
 
 class Data {
   constructor(date, properties) {
