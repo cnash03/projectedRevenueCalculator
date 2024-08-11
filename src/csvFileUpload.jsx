@@ -80,7 +80,7 @@ export const fetchFirestoreData = async () => {
   try {
     const querySnapshot = await getDocs(collection(db, "entries")); // Directly target the "Dates" collection
     const data = querySnapshot.docs.map(doc => ({
-      id: doc.id, 
+      id: doc.id, // Extract the document ID
     }));
     console.log(data);
     return data;
