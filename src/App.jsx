@@ -10,13 +10,6 @@ import { firebaseConfig } from '../configFirebase';
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Get the functions instance
-const functions = getFunctions(app);
-
-// Create the callable function
-// const listCollections = httpsCallable(functions, 'listCollections');
-const helloWorld = httpsCallable(functions, 'hello_world');
-
 
 class Data {
   constructor(date) {
@@ -26,19 +19,8 @@ class Data {
 
 const initialData = [
   new Data("Live"),
-  new Data("2/25/2024"),
-  new Data("2/18/2024"),
 ];
 
-const getCollectionNames = async () => {
-  try {
-    console.log("ENTERED");
-    const result = await axios.get('https://us-central1-projected-revenue-calculator.cloudfunctions.net/hello_world');
-    console.log(result.data);
-  } catch (error) {
-    console.error("Error :", error);
-  }
-};
 
 function App() {
   const [uploadedFile, setUploadedFile] = useState(null);
@@ -47,7 +29,6 @@ function App() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const dropdownRef = useRef(null);
-
 
   const [isDragging, setIsDragging] = useState(false);
   const dragCounter = useRef(0);
@@ -97,17 +78,20 @@ function App() {
       e.dataTransfer.clearData();
     }
   };
-  
-  useEffect(() => {
-    console.log("Use Effect");
-    getCollectionNames();
-  }, []);
 
+// Helper function to reformat date
+function reformatDate(dateString) {
+  const [year, month, day] = dateString.split('-');
+  return `${parseInt(month)}/${parseInt(day)}/${year}`;
+}
   useEffect(() => {
     const loadInitialData = async () => {
       try {
         const firestoreData = await fetchFirestoreData();
-        setData([...initialData, ...firestoreData]);
+        const firestoreEntries = firestoreData.map(item => 
+          new Data(reformatDate(item.id))
+        );
+        setData([...initialData, ...firestoreEntries]);
       } catch (error) {
         console.error("Error loading initial data:", error);
       }
