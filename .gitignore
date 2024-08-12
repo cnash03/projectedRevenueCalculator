@@ -11,7 +11,6 @@ node_modules
 dist
 dist-ssr
 *.local
-.env
 functions/serviceAccountKey.json
 
 # Editor directories and files
@@ -25,3 +24,5 @@ functions/serviceAccountKey.json
 *.sln
 *.sw?
 functions/serviceAccountKey.json
+configFirebase.js
+.env
