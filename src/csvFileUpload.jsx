@@ -1,6 +1,6 @@
 import Papa from 'papaparse';
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, addDoc, getDocs, setDoc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, getDocs, doc, setDoc } from 'firebase/firestore';
 import { firebaseConfig } from '../configFirebase'; // Adjust the path as needed
 
 // const firebaseConfig = {
