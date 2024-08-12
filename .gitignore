@@ -11,6 +11,7 @@ node_modules
 dist
 dist-ssr
 *.local
+.env
 functions/serviceAccountKey.json
 
 # Editor directories and files
