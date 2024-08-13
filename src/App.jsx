@@ -1,7 +1,9 @@
 import { useState, useEffect , useRef} from 'react';
 import PooRoverLogo from './assets/PooRoverLogo.png';
-import { parseAndUploadCSV, fetchFirestoreData } from './csvFileUpload';
+import { parseAndUploadCSV, fetchFirestoreData, fetchDateData } from './csvFileUpload';
+import MyPivotTable from './PivotTable';
 import './App.css';
+import PivotTable from 'react-pivottable/PivotTable';
 
 class Data {
   constructor(date) {
@@ -10,9 +12,12 @@ class Data {
 }
 
 const initialData = [
-  new Data("Live"),
+  // new Data("Live"),
 ];
 
+function refreshPage() {
+  location.reload(true);
+}
 
 function App() {
   const [uploadedFile, setUploadedFile] = useState(null);
@@ -53,19 +58,30 @@ function App() {
     e.stopPropagation();
     setIsDragging(false);
     dragCounter.current = 0;
+    
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const file = e.dataTransfer.files[0];
+      setIsUploading(true);
+      
       if (file.type === "text/csv") {
         try {
           const newData = await parseAndUploadCSV(file);
           setData(prevData => [...prevData, ...newData]);
           setUploadedFile(file);
+          
+          // Wait for state updates to complete
+          setTimeout(() => {
+            window.location.reload(true);
+          }, 1000);
         } catch (error) {
           console.error("Error processing file:", error);
           alert("An error occurred while processing the file.");
+        } finally {
+          setIsUploading(false);
         }
       } else {
         alert("Please upload a valid CSV file.");
+        setIsUploading(false);
       }
       e.dataTransfer.clearData();
     }
@@ -126,30 +142,33 @@ function reformatDate(dateString) {
     }
   };
 
-  function loadDashboard(dataItem) {
-    if (selectedFiles.length === 0 || selectedFiles.includes(dataItem.date)) {
-      return (
-        <div key={dataItem.date} className="page-dashboard-outer-container">
-          <h5 className='page-dashboard-outer-container-title'>
-            <span>{dataItem.date}</span> 
-            <span className='offset-color-text'> Upload</span>
-          </h5>
-        </div>
-      );
-    }
-    return null;
-  }
+  // async function loadDashboard(dataItem){
+  //   const [month, day, year] = dataItem.date.split('/');
+  //   const date =`${year}-0${parseInt(month)}-${parseInt(day)}`;
+  //   try{
+  //     const firestoreDate = await fetchDateData(date);
+  //     if (selectedFiles.length === 0 || selectedFiles.includes(dataItem.date)) {
+  //       return (
+  //         <div key={dataItem.date} className="page-dashboard-outer-container">
+  //           <h5 className='page-dashboard-outer-container-title'>
+  //             <span>{dataItem.date}</span> 
+  //             <span className='offset-color-text'> Upload</span>
+  //           </h5>
+  //           {firestoreDate && <MyPivotTable data={firestoreDate} />}
+  //         </div>
+  //       );
+  //     }
+  //   }catch{
+  //     console.log(error);
+  //   }
+  //   return null;
+  // };
 
   const handleFileSelect = (date) => {
-    setSelectedFiles(prev => {
-      const newSelection = prev.includes(date)
-        ? prev.filter(item => item !== date)
-        : [...prev, date];
-      
-      // If no files are selected, show all dashboards
-      if (newSelection.length === 0) {
-        return [];
-      }
+    setSelectedFiles((prevSelectedFiles) => {
+      const newSelection = prevSelectedFiles.includes(date)
+        ? prevSelectedFiles.filter(item => item !== date)
+        : [...prevSelectedFiles, date];
       
       return newSelection;
     });
@@ -158,6 +177,41 @@ function reformatDate(dateString) {
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
+
+  function Dashboard({ dataItem }) {
+    const [firestoreDate, setFirestoreDate] = useState(null);
+    const [loading, setLoading] = useState(true);
+  
+    useEffect(() => {
+      async function fetchData() {
+        try {
+          const [month, day, year] = dataItem.date.split('/');
+          const date = `${year}-0${parseInt(month)}-${parseInt(day)}`;
+          const firestoreData = await fetchDateData(date);
+          setFirestoreDate(firestoreData);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        } finally {
+          setLoading(false);
+        }
+      }
+      fetchData();
+    }, [dataItem]);
+  
+    if (loading) {
+      return <div>Loading...</div>;
+    }
+  
+    return (
+      <div key={dataItem.date} className="page-dashboard-outer-container">
+        <h5 className='page-dashboard-outer-container-title'>
+          <span>{dataItem.date}</span> 
+          <span className='offset-color-text'> Upload</span>
+        </h5>
+        {firestoreDate && <MyPivotTable data={firestoreDate} />}
+      </div>
+    );
+  }
 
   return (
     <>
@@ -172,7 +226,16 @@ function reformatDate(dateString) {
       </div>
       <div className='page-content'>
         <div className='left-main-content'>
-            {data.map(dataItem => loadDashboard(dataItem))}
+        {data.map(dataItem => {
+          // Check if any files are selected, otherwise show all dashboards
+          if (selectedFiles.length === 0 || selectedFiles.includes(dataItem.date)) {
+            return (
+              <Dashboard key={dataItem.date} dataItem={dataItem} />
+            );
+          }
+          return null;
+        })}
+
         </div>
         <div className='right-main-content'>
         <div 
