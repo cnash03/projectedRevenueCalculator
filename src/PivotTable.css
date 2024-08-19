@@ -1,0 +1,15 @@
+.table-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px; /* Optional: adds space between the two tables */
+}
+
+.pivot-table {
+    flex: 1; /* Adjust flex values as needed */
+}
+
+.data-table {
+    flex: 1; /* Adjust flex values as needed */
+}

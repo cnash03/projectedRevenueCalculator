@@ -3,7 +3,6 @@ import PooRoverLogo from './assets/PooRoverLogo.png';
 import { parseAndUploadCSV, fetchFirestoreData, fetchDateData } from './csvFileUpload';
 import MyPivotTable from './PivotTable';
 import './App.css';
-import PivotTable from 'react-pivottable/PivotTable';
 
 class Data {
   constructor(date) {
@@ -142,28 +141,6 @@ function reformatDate(dateString) {
     }
   };
 
-  // async function loadDashboard(dataItem){
-  //   const [month, day, year] = dataItem.date.split('/');
-  //   const date =`${year}-0${parseInt(month)}-${parseInt(day)}`;
-  //   try{
-  //     const firestoreDate = await fetchDateData(date);
-  //     if (selectedFiles.length === 0 || selectedFiles.includes(dataItem.date)) {
-  //       return (
-  //         <div key={dataItem.date} className="page-dashboard-outer-container">
-  //           <h5 className='page-dashboard-outer-container-title'>
-  //             <span>{dataItem.date}</span> 
-  //             <span className='offset-color-text'> Upload</span>
-  //           </h5>
-  //           {firestoreDate && <MyPivotTable data={firestoreDate} />}
-  //         </div>
-  //       );
-  //     }
-  //   }catch{
-  //     console.log(error);
-  //   }
-  //   return null;
-  // };
-
   const handleFileSelect = (date) => {
     setSelectedFiles((prevSelectedFiles) => {
       const newSelection = prevSelectedFiles.includes(date)
@@ -208,7 +185,9 @@ function reformatDate(dateString) {
           <span>{dataItem.date}</span> 
           <span className='offset-color-text'> Upload</span>
         </h5>
+        <div className='pivot-table-container'>
         {firestoreDate && <MyPivotTable data={firestoreDate} />}
+        </div>
       </div>
     );
   }

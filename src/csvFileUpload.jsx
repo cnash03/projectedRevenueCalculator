@@ -82,7 +82,6 @@ export const fetchFirestoreData = async () => {
     const data = querySnapshot.docs.map(doc => ({
       id: doc.id, // Extract the document ID
     }));
-    console.log(data);
     return data;
   } catch (error) {
     console.error("Error fetching data from Firestore: ", error);
@@ -99,9 +98,8 @@ export const fetchDateData = async (date) =>{
     const data = querySnapshot.docs.map(doc => 
       ({
         SubsName: doc.data()['Subs. Name'], // Assuming "Subs.Name" is stored with double underscores
-        Revenue: doc.data().Revenue,
+        Revenue: doc.data().Revenue.replace(' per cleanup', '') // Extract numeric value,
       }));
-    console.log(data);
     return data;
   } catch (error) {
     console.error("Error getting documents: ", error);
