@@ -1,15 +1,17 @@
 .table-container {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 20px; /* Optional: adds space between the two tables */
 }
 
-.pivot-table {
-    flex: 1; /* Adjust flex values as needed */
+.pivot-table-container{
+    flex: 1;
+    display: flex;
+    flex-direction: row;
 }
-
-.data-table {
-    flex: 1; /* Adjust flex values as needed */
+.data-table-container {
+    flex: 1;
+    height: inherit;
+}
+.data-table .MuiDataGrid-row {
+    /* height: 50px; Set the height of each row to 75 pixels */
 }

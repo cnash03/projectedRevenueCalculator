@@ -67,35 +67,62 @@ const StaticPivotTable = ({ data }) => {
         {
             name: '12 Month Revenue',
             selector: row => row.SubsName === 'Total' 
-                ? `$${row.Total12MonthRevenue.toFixed(2)}`
-                : `$${(row.Revenue * row.Count).toFixed(2)}`,
-            sortable: true,
+                ? `$${row.Total12MonthRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                : `$${(row.Revenue * row.Count).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
         },
         {
             name: 'Monthly Revenue',
             selector: row => row.SubsName === 'Total'
-                ? `$${row.TotalMonthlyRevenue.toFixed(2)}`
-                : `$${(row.Revenue * row.Count / 12).toFixed(2)}`,
-            sortable: true,
+                ? `$${row.TotalMonthlyRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                : `$${(row.Revenue * row.Count / 12).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
         },
     ];
 
+    const customStyles = {
+        headCells: {
+            style: {
+                minHeight: '53.98px',
+                margin: '3px 0 0 0'
+            }
+        },
+        rows: {
+            style: {
+                minHeight: '51.59px',
+                // padding: '5px 0 0 0'
+            }
+        },
+        cells: {
+            style: {
+                margin: 0,
+                padding: 0,
+                fontSize: '8pt'
+            }
+        }
+    }
+
     return (
         <div className="table-container">
-            <div className="pivot-table">
+            <div className="pivot-table-container">
                 <PivotTable
                     data={data}
                     {...pivotConfig}
                 />
+                <div className="data-table-container">
+                <DataTable
+                    columns={columns}
+                    data={tableData}
+                    customStyles={customStyles}
+                />
+                </div>
             </div>
-            <div className="data-table">
+            {/* <div className="data-table-container">
                 <DataTable
                     columns={columns}
                     data={tableData}
                 />
-            </div>
+            </div> */}
         </div>
     );
-};
+}
 
 export default StaticPivotTable;

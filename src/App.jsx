@@ -14,10 +14,6 @@ const initialData = [
   // new Data("Live"),
 ];
 
-function refreshPage() {
-  location.reload(true);
-}
-
 function App() {
   const [uploadedFile, setUploadedFile] = useState(null);
   const [data, setData] = useState(initialData);
@@ -25,6 +21,7 @@ function App() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const dropdownRef = useRef(null);
+  const [isFileUploaded, setIsFileUploaded] = useState(false);
 
   const [isDragging, setIsDragging] = useState(false);
   const dragCounter = useRef(0);
@@ -57,21 +54,18 @@ function App() {
     e.stopPropagation();
     setIsDragging(false);
     dragCounter.current = 0;
-    
+  
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const file = e.dataTransfer.files[0];
       setIsUploading(true);
-      
+      setIsFileUploaded(false);
+  
       if (file.type === "text/csv") {
         try {
-          const newData = await parseAndUploadCSV(file);
-          setData(prevData => [...prevData, ...newData]);
+          // Simulate file processing
+          await new Promise(resolve => setTimeout(resolve, 2000));
           setUploadedFile(file);
-          
-          // Wait for state updates to complete
-          setTimeout(() => {
-            window.location.reload(true);
-          }, 1000);
+          setIsFileUploaded(true);
         } catch (error) {
           console.error("Error processing file:", error);
           alert("An error occurred while processing the file.");
@@ -83,6 +77,25 @@ function App() {
         setIsUploading(false);
       }
       e.dataTransfer.clearData();
+    }
+  };
+  
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    if (file && file.type === "text/csv") {
+      setIsUploading(true);
+      try {
+        const { data: newData, collectionName } = await parseAndUploadCSV(file);
+        setUploadedFile(file);
+        setIsFileUploaded(true); // Set isFileUploaded to true after successful upload
+      } catch (error) {
+        console.error("Error processing file:", error);
+        alert("An error occurred while processing the file. " + error.message);
+      } finally {
+        setIsUploading(false);
+      }
+    } else {
+      alert("Please upload a valid CSV file.");
     }
   };
 
@@ -123,23 +136,23 @@ function reformatDate(dateString) {
     };
   }, []);
 
-  const handleFileUpload = async (event) => {
-    const file = event.target.files[0];
-    if (file && file.type === "text/csv") {
-      setIsUploading(true);
-      try {
-        const { data: newData, collectionName } = await parseAndUploadCSV(file);
-        setUploadedFile(file);
-      } catch (error) {
-        console.error("Error processing file:", error);
-        alert("An error occurred while processing the file. " + error.message);
-      } finally {
-        setIsUploading(false);
-      }
-    } else {
-      alert("Please upload a valid CSV file.");
-    }
-  };
+  // const handleFileUpload = async (event) => {
+  //   const file = event.target.files[0];
+  //   if (file && file.type === "text/csv") {
+  //     setIsUploading(true);
+  //     try {
+  //       const { data: newData, collectionName } = await parseAndUploadCSV(file);
+  //       setUploadedFile(file);
+  //     } catch (error) {
+  //       console.error("Error processing file:", error);
+  //       alert("An error occurred while processing the file. " + error.message);
+  //     } finally {
+  //       setIsUploading(false);
+  //     }
+  //   } else {
+  //     alert("Please upload a valid CSV file.");
+  //   }
+  // };
 
   const handleFileSelect = (date) => {
     setSelectedFiles((prevSelectedFiles) => {
@@ -240,8 +253,8 @@ function reformatDate(dateString) {
             <div className='page-file-upload-text-smaller'>
               File is uploading...
             </div>
-          ) : uploadedFile ? (
-            <p className='page-file-upload-text-smaller'>Uploaded: {uploadedFile.name}</p>
+          ) : isFileUploaded ? (
+            <p className='page-file-upload-text-smaller'>Uploaded: {uploadedFile?.name}</p>
           ) : null}
         </div>
           <div className='page-file-compare-container'>

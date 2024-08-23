@@ -81,13 +81,12 @@ export const fetchFirestoreData = async () => {
     const querySnapshot = await getDocs(collection(db, "entries")); // Directly target the "Dates" collection
     const data = querySnapshot.docs.map(doc => ({
       id: doc.id, // Extract the document ID
-    }));
+    })).reverse();
     return data;
   } catch (error) {
     console.error("Error fetching data from Firestore: ", error);
     throw error;
   }
-
 };
 
 export const fetchDateData = async (date) =>{
