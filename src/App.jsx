@@ -21,8 +21,6 @@ function App() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const dropdownRef = useRef(null);
-  const [isFileUploaded, setIsFileUploaded] = useState(false);
-
   const [isDragging, setIsDragging] = useState(false);
   const dragCounter = useRef(0);
 
@@ -54,32 +52,24 @@ function App() {
     e.stopPropagation();
     setIsDragging(false);
     dragCounter.current = 0;
-  
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const file = e.dataTransfer.files[0];
-      setIsUploading(true);
-      setIsFileUploaded(false);
-  
       if (file.type === "text/csv") {
         try {
-          // Simulate file processing
-          await new Promise(resolve => setTimeout(resolve, 2000));
+          const newData = await parseAndUploadCSV(file);
+          setData(prevData => [...prevData, ...newData]);
           setUploadedFile(file);
-          setIsFileUploaded(true);
         } catch (error) {
           console.error("Error processing file:", error);
           alert("An error occurred while processing the file.");
-        } finally {
-          setIsUploading(false);
         }
       } else {
         alert("Please upload a valid CSV file.");
-        setIsUploading(false);
       }
       e.dataTransfer.clearData();
     }
   };
-  
+
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (file && file.type === "text/csv") {
@@ -87,7 +77,6 @@ function App() {
       try {
         const { data: newData, collectionName } = await parseAndUploadCSV(file);
         setUploadedFile(file);
-        setIsFileUploaded(true); // Set isFileUploaded to true after successful upload
       } catch (error) {
         console.error("Error processing file:", error);
         alert("An error occurred while processing the file. " + error.message);
@@ -100,10 +89,11 @@ function App() {
   };
 
 // Helper function to reformat date
-function reformatDate(dateString) {
-  const [year, month, day] = dateString.split('-');
-  return `${parseInt(month)}/${parseInt(day)}/${year}`;
-}
+  function reformatDate(dateString) {
+    const [year, month, day] = dateString.split('-');
+    return `${parseInt(month)}/${parseInt(day)}/${year}`;
+  }
+
   useEffect(() => {
     const loadInitialData = async () => {
       try {
@@ -123,6 +113,17 @@ function reformatDate(dateString) {
   useEffect(() => {
     setSelectedFiles([]);
   }, []);
+  useEffect(() => {
+    setUploadedFile();
+  }, [uploadedFile]);
+
+  useEffect(() => {
+    console.log("Is Uploading:", isUploading);
+  }, [isUploading]);
+
+  useEffect(()=>{
+    console.log("")
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -135,24 +136,6 @@ function reformatDate(dateString) {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
-  // const handleFileUpload = async (event) => {
-  //   const file = event.target.files[0];
-  //   if (file && file.type === "text/csv") {
-  //     setIsUploading(true);
-  //     try {
-  //       const { data: newData, collectionName } = await parseAndUploadCSV(file);
-  //       setUploadedFile(file);
-  //     } catch (error) {
-  //       console.error("Error processing file:", error);
-  //       alert("An error occurred while processing the file. " + error.message);
-  //     } finally {
-  //       setIsUploading(false);
-  //     }
-  //   } else {
-  //     alert("Please upload a valid CSV file.");
-  //   }
-  // };
 
   const handleFileSelect = (date) => {
     setSelectedFiles((prevSelectedFiles) => {
@@ -203,7 +186,7 @@ function reformatDate(dateString) {
         </div>
       </div>
     );
-  }
+  };
 
   return (
     <>
@@ -230,7 +213,7 @@ function reformatDate(dateString) {
 
         </div>
         <div className='right-main-content'>
-        <div 
+           <div 
           className={`page-file-uploads-container ${isDragging ? 'dragging' : ''}`}
           onDragEnter={handleDragIn}
           onDragLeave={handleDragOut}
@@ -253,8 +236,8 @@ function reformatDate(dateString) {
             <div className='page-file-upload-text-smaller'>
               File is uploading...
             </div>
-          ) : isFileUploaded ? (
-            <p className='page-file-upload-text-smaller'>Uploaded: {uploadedFile?.name}</p>
+          ) : uploadedFile ? (
+            <p className='page-file-upload-text-smaller'>Uploaded: {uploadedFile.name}</p>
           ) : null}
         </div>
           <div className='page-file-compare-container'>
