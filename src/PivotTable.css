@@ -1,17 +1,15 @@
 .table-container {
     display: flex;
     flex-direction: row;
+    height: 435px; /* Adjust the height as needed */
 }
 
-.pivot-table-container{
+.pivot-table-container {
     flex: 1;
     display: flex;
-    flex-direction: row;
 }
-.data-table-container {
+.data-table-container .rdt_Table{
     flex: 1;
-    height: inherit;
-}
-.data-table .MuiDataGrid-row {
-    /* height: 50px; Set the height of each row to 75 pixels */
+    height: 100%;
+    margin-top: 3px;
 }

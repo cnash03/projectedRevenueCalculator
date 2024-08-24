@@ -57,7 +57,7 @@ const StaticPivotTable = ({ data }) => {
 
     // Add total row to the tableData
     tableData.push({
-        id: 1,
+        id: 'total',
         SubsName: 'Total',
         Total12MonthRevenue: total12MonthRevenue,
         TotalMonthlyRevenue: totalMonthlyRevenue,
@@ -81,22 +81,19 @@ const StaticPivotTable = ({ data }) => {
     const customStyles = {
         headCells: {
             style: {
-                minHeight: '53.98px',
-                margin: '3px 0 0 0'
+                minHeight: '63px',
             }
         },
         rows: {
             style: {
-                minHeight: '51.59px',
-                // padding: '5px 0 0 0'
+                padding: '5px',
+                minHeight:'42.99px'
             }
         },
         cells: {
             style: {
-                margin: 0,
-                padding: 0,
-                fontSize: '8pt'
-            }
+                fontSize: '9pt',
+           }
         }
     }
 
@@ -107,20 +104,16 @@ const StaticPivotTable = ({ data }) => {
                     data={data}
                     {...pivotConfig}
                 />
-                <div className="data-table-container">
-                <DataTable
-                    columns={columns}
-                    data={tableData}
-                    customStyles={customStyles}
-                />
+                <div>
+                    <div className="data-table-container" style={{ fontSize: '9pt', fontFamily: 'Verdana' }} >
+                    <DataTable
+                        columns={columns}
+                        data={tableData}
+                        customStyles={customStyles}
+                    />
+                </div>
                 </div>
             </div>
-            {/* <div className="data-table-container">
-                <DataTable
-                    columns={columns}
-                    data={tableData}
-                />
-            </div> */}
         </div>
     );
 }
