@@ -81,7 +81,7 @@ const StaticPivotTable = ({ data }) => {
     const customStyles = {
         headCells: {
             style: {
-                minHeight: '63px',
+                minHeight: '53.98px',
             }
         },
         rows: {
