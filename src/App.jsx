@@ -55,13 +55,16 @@ function App() {
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const file = e.dataTransfer.files[0];
       if (file.type === "text/csv") {
+        setIsUploading(true);
         try {
           const newData = await parseAndUploadCSV(file);
-          setData(prevData => [...prevData, ...newData]);
           setUploadedFile(file);
         } catch (error) {
           console.error("Error processing file:", error);
           alert("An error occurred while processing the file.");
+        }
+        finally{
+          setIsUploading(false)
         }
       } else {
         alert("Please upload a valid CSV file.");
@@ -75,8 +78,8 @@ function App() {
     if (file && file.type === "text/csv") {
       setIsUploading(true);
       try {
-        const { data: newData, collectionName } = await parseAndUploadCSV(file);
-        setUploadedFile(file);
+        const data = await parseAndUploadCSV(file);
+        setUploadedFile(file.name);
       } catch (error) {
         console.error("Error processing file:", error);
         alert("An error occurred while processing the file. " + error.message);
@@ -113,9 +116,11 @@ function App() {
   useEffect(() => {
     setSelectedFiles([]);
   }, []);
+
   useEffect(() => {
-    setUploadedFile();
-  }, [uploadedFile]);
+    if (uploadedFile) {
+      console.log("uploadedFile:", uploadedFile);
+    }  }, [uploadedFile]);
 
   useEffect(() => {
     console.log("Is Uploading:", isUploading);
@@ -229,15 +234,15 @@ function App() {
             id="file-upload" 
             type="file" 
             accept=".csv" 
-            style={{display: 'none'}} 
-            onChange={handleFileUpload}
+            style={{ display: 'none' }} 
+            onChange={handleFileUpload} 
           />
           {isUploading ? (
             <div className='page-file-upload-text-smaller'>
               File is uploading...
             </div>
           ) : uploadedFile ? (
-            <p className='page-file-upload-text-smaller'>Uploaded: {uploadedFile.name}</p>
+            <p className='page-file-upload-text-smaller'>Uploaded: {uploadedFile}</p>
           ) : null}
         </div>
           <div className='page-file-compare-container'>

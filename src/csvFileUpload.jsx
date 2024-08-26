@@ -29,7 +29,6 @@ export const parseAndUploadCSV = (file) => {
         for (let row of results.data) {
           // Check if all entries in the row are empty
           if (Object.values(row).every(value => value === "")) {
-            console.log("Encountered a blank line. Stopping upload.");
             stopUpload = true;
             break;
           }
@@ -47,16 +46,12 @@ export const parseAndUploadCSV = (file) => {
   
         try {
           for (let item of newData) {
-            console.log("Uploading"+item);
             await addDoc(collection(db, collectionName), {
               date: item.date,
               ...item
             });
           }
-          console.log(`Data uploaded to Firestore successfully. ${newData.length} entries processed.`);
         } catch (error) {
-          console.error("Error uploading to Firestore: ", error);
-          console.error("Error details:", error.message, error.code);
           reject(error);
         }
 
@@ -66,7 +61,6 @@ export const parseAndUploadCSV = (file) => {
           await setDoc(docRef, {
             collectionName
           });
-          console.log('Document created successfully');
         }catch(error){
           console.error('Error creating document:', error);
         }
@@ -74,6 +68,7 @@ export const parseAndUploadCSV = (file) => {
       header: true,
       skipEmptyLines: false, // Changed to false to handle empty lines ourselves
     });
+    resolve();
   });
 };
 export const fetchFirestoreData = async () => {
