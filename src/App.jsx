@@ -93,8 +93,8 @@ function App() {
 
 // Helper function to reformat date
   function reformatDate(dateString) {
-    const [year, month, day] = dateString.split('-');
-    return `${parseInt(month)}/${parseInt(day)}/${year}`;
+    let [year, month, day] = dateString.split('-');
+    return `${parseInt(month)}/${day}/${year}`;
   }
 
   useEffect(() => {
@@ -163,8 +163,9 @@ function App() {
     useEffect(() => {
       async function fetchData() {
         try {
-          const [month, day, year] = dataItem.date.split('/');
-          const date = `${year}-0${parseInt(month)}-${parseInt(day)}`;
+          let [month, day, year] = dataItem.date.split('/');
+          day = day.padStart(2, '0');
+          const date = `${year}-0${parseInt(month)}-${day}`;
           const firestoreData = await fetchDateData(date);
           setFirestoreDate(firestoreData);
         } catch (error) {
